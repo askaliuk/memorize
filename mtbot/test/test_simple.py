@@ -1,13 +1,28 @@
 import unittest
-from sleekxmpp.test import SleekTest
-from mtbot.gtalkbot import GTalkBot
+from gtalkbot_test import GtalkBotTest
 
 
-class TestSimple(SleekTest):
+class TestSimple(GtalkBotTest):
 
     def test_simple(self):
-        """Test that we can interact with a mock GTalkBot instance."""
-        pass
+        """Simple test which interacts with a mock GTalkBot instance."""
+        self.memorize_stream_start()
+
+        def echo(msg):
+            msg.reply('Thanks for sending: %(body)s' % msg).send()
+
+        self.xmpp.add_event_handler('message', echo)
+        self.recv("""
+            <message to="tester@localhost" from="user@localhost">
+                <body>Hi!</body>
+            </message>
+        """)
+
+        self.send("""
+            <message to="user@localhost">
+                <body>Thanks for sending: Hi!</body>
+            </message>
+        """)
 
     def tearDown(self):
         self.stream_close()

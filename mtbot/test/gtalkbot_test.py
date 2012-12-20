@@ -1,15 +1,19 @@
+import logging
 import unittest
 from mtbot.gtalkbot import GTalkBot
+from sleekxmpp.test import SleekTest, TestSocket, TestLiveSocket
+from sleekxmpp.util import Queue
 
 
-class GtalkBotTest(unittest.TestCase):
+class GtalkBotTest(SleekTest):
+    """
+    A Memorize specific TestCase class. Based on SleekTest.
+    """
 
-    def start_bot(self, skip=True, header=None, socket='mock',
+    def memorize_stream_start(self, skip=True, header=None, socket='mock',
                   jid='tester@localhost', password='test', server='localhost',
-                  port=5222, sasl_mech=None, plugins=None, plugin_config={}):
-        self.xmpp = GTalkBot(jid, password,
-                             sasl_mech=sasl_mech,
-                             plugin_config=plugin_config)
+                  port=5222):
+        self.xmpp = GTalkBot(jid, password, log_level=logging.ERROR)
 
         # We will use this to wait for the session_start event
         # for live connections.
@@ -40,12 +44,6 @@ class GtalkBotTest(unittest.TestCase):
                 self.xmpp.connect()
         else:
             raise ValueError("Unknown socket type.")
-
-        if plugins is None:
-            self.xmpp.register_plugins()
-        else:
-            for plugin in plugins:
-                self.xmpp.register_plugin(plugin)
 
         # Some plugins require messages to have ID values. Set
         # this to True in tests related to those plugins.

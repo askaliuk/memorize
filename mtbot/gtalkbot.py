@@ -14,14 +14,15 @@ if sys.version_info < (3, 0):
 else:
     raw_input = input
 
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
 
 class GTalkBot(sleekxmpp.ClientXMPP):
 
-    def __init__(self, jid, password):
+    logging_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+
+    def __init__(self, jid, password, log_level=logging.DEBUG):
+        logging.basicConfig(
+            level=log_level,
+            format=GTalkBot.logging_format)
         self.log = logging.getLogger(__name__)
         sleekxmpp.ClientXMPP.__init__(self, jid, password)
         self.logiclib = logiclib.LogicLib()
