@@ -5,7 +5,7 @@ from gtalkbot_test import GtalkBotTest
 class TestSimple(GtalkBotTest):
 
     def test_simple(self):
-        """Simple test which interacts with a mock GTalkBot instance."""
+        """Basic simple test which interacts with a mocked GTalkBot instance."""
         self.memorize_stream_start()
 
         def echo(msg):

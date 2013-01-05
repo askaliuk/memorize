@@ -2,7 +2,6 @@
 import sys
 import logging
 import sleekxmpp
-import logiclib
 
 # Python versions before 3.0 do not use UTF-8 encoding
 # by default. To ensure that Unicode is handled properly
@@ -20,13 +19,15 @@ class GTalkBot(sleekxmpp.ClientXMPP):
     logging_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     PRESENSE_STATUS = "I'm memorize bot"
 
-    def __init__(self, jid, password, log_level=logging.DEBUG):
+    def __init__(self, jid, password, logiclib, log_level=logging.DEBUG):
         logging.basicConfig(
             level=log_level,
             format=GTalkBot.logging_format)
         self.log = logging.getLogger(__name__)
         sleekxmpp.ClientXMPP.__init__(self, jid, password)
-        self.logiclib = logiclib.LogicLib()
+        if not logiclib:
+            raise ValueError("logiclib instance is required")
+        self.logiclib = logiclib
         # TODO(askalyuk): make send message handler independent
         # from XMPP implementation
         self.logiclib.set_send_message_handler(self.send_message)
@@ -53,8 +54,6 @@ class GTalkBot(sleekxmpp.ClientXMPP):
                      data.
         """
         self.send_presence(pstatus=GTalkBot.PRESENSE_STATUS)
-        # TODO(askalyuk): temporary for testing
-        return
         self.log.info("Retrieve contact list")
         self.get_roster()
         self.log.info("%d contact(s) found." % len(self.client_roster.keys()))

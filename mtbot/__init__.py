@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from mtbot import gtalkbot
+from mtbot import logiclib
 
 
 def start(jid, password):
     # Setup the GtalkBot and register plugins. Note that while plugins may
     # have interdependencies, the order in which you register them does
     # not matter.
-    bot = gtalkbot.GTalkBot(jid, password)
+    bot = gtalkbot.GTalkBot(jid, password, logiclib.LogicLib())
 
     # If you are working with an OpenFire server, you may need
     # to adjust the SSL version used:
