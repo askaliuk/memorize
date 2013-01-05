@@ -1,0 +1,14 @@
+General:
+* Anything with colon at the end of the line is a project title, you can also nest projects by indenting them.
+* run tests - run_mtbot_tests.sh
+* ⌘ + enter or ⌘ + i: new task
+* ⌘ + d**: toggle task as completed
+
+Last context:
+test_bot.py - make full test for GTalkBot.start method
+
+Test infrastructure:
+ ✔ create simple test @done (12-12-27 09:52)
+ ✔ create basic session handler test in test_bot.py (hybrid way) @done (13-01-04 22:32)
+ ☐ finish full session handler test
+

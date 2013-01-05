@@ -18,6 +18,7 @@ else:
 class GTalkBot(sleekxmpp.ClientXMPP):
 
     logging_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    PRESENSE_STATUS = "I'm memorize bot"
 
     def __init__(self, jid, password, log_level=logging.DEBUG):
         logging.basicConfig(
@@ -33,7 +34,7 @@ class GTalkBot(sleekxmpp.ClientXMPP):
         # The session_start event will be triggered when
         # the bot establishes its connection with the server
         # and the XML streams are ready for use. We want to
-        # listen for this event so that we we can initialize
+        # listen for this event so that we can initialize
         # our roster.
         self.add_event_handler("session_start", self.start)
 
@@ -51,7 +52,9 @@ class GTalkBot(sleekxmpp.ClientXMPP):
                      event does not provide any additional
                      data.
         """
-        self.send_presence(pstatus="I'm memorize bot")
+        self.send_presence(pstatus=GTalkBot.PRESENSE_STATUS)
+        # TODO(askalyuk): temporary for testing
+        return
         self.log.info("Retrieve contact list")
         self.get_roster()
         self.log.info("%d contact(s) found." % len(self.client_roster.keys()))

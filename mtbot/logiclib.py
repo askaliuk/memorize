@@ -4,7 +4,7 @@ import logging
 
 class LogicLib(object):
     """Library, which implements bot's 'brain'.
-    It tracks users makes decision what to ask and how to reply."""
+    It tracks users and makes decision what to ask and how to reply."""
     def __init__(self):
         super(LogicLib, self).__init__()
         self.log = logging.getLogger(__name__)
