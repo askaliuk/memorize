@@ -7,7 +7,11 @@ def start(jid, password):
     # Setup the GtalkBot and register plugins. Note that while plugins may
     # have interdependencies, the order in which you register them does
     # not matter.
-    bot = gtalkbot.GTalkBot(jid, password, logiclib.LogicLib())
+    logic = logiclib.LogicLib()
+    bot = gtalkbot.GTalkBot(jid, password, logic)
+
+    # Process users each 60 seconds using build-in SleekXMPP scheduler
+    bot.scheduler.add("mtbot_action", 60, logic.process_users, repeat=True)
 
     # If you are working with an OpenFire server, you may need
     # to adjust the SSL version used:

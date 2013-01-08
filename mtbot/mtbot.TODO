@@ -1,14 +1,26 @@
-General:
+How to use TODO:
 * Anything with colon at the end of the line is a project title, you can also nest projects by indenting them.
 * run tests - run_mtbot_tests.sh
 * ⌘ + enter or ⌘ + i: new task
 * ⌘ + d**: toggle task as completed
 
 Last context:
-test_bot.py - make full test for GTalkBot.start method
+next step is to implement logiclib.refresh_contact_list method.
+The idea is: if someone adds bot to contact list, it should start teach him/her.
+Method should create or update users according to contact list.
+it should call data access layer method.
 
 Test infrastructure:
  ✔ create simple test @done (12-12-27 09:52)
  ✔ create basic session handler test in test_bot.py (hybrid way) @done (13-01-04 22:32)
- ☐ finish full session handler test
+ ✔ finish full session handler test @done (13-01-05 15:07)
+
+ Data layer infrastructure:
+ ☐ Logiclib should not know about datasource (django orm in our case). It should talk with some specific data layer class which does what it wants.
+ ☐ what API do we really need from data access layer?
+     * create_new_user(email, name) - temporary
+     * get_users_to_update() -> returns json users data
+     * update_user_status(user_id, new_status) -> returns success status
+     * update_memory_card_status(memory_card_id, new_status) -> returns success status
+     * get_next_memory_card(user_id) -> returns json data
 
