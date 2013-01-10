@@ -30,7 +30,8 @@ class GTalkBot(sleekxmpp.ClientXMPP):
         self.logiclib = logiclib
         # TODO(askalyuk): make send message handler independent
         # from XMPP implementation
-        self.logiclib.set_send_message_handler(self.send_message)
+        self.logiclib.set_send_message_handler(
+            lambda jid, body: self._send_message(jid, body))
 
         # The session_start event will be triggered when
         # the bot establishes its connection with the server
@@ -42,7 +43,7 @@ class GTalkBot(sleekxmpp.ClientXMPP):
         # The message event is triggered whenever a message
         # stanza is received. Be aware that that includes
         # MUC messages and error messages.
-        self.add_event_handler("message", self.message)
+        self.add_event_handler("message", self.income_message)
 
     def start(self, event):
         """
@@ -61,22 +62,10 @@ class GTalkBot(sleekxmpp.ClientXMPP):
         # implementation
         self.logiclib.refresh_contact_list(self.client_roster)
 
-    # def send_messages(self):
-    #     """
-    #     Ask logic library about new messages for each contact and
-    #     send them.
-    #     """
-    #     for contact in self.client_roster.keys():
-    #         self.send_message(contact,
-    #             "Hello, i'm bot. Will ask you questions.", mtype="chat")
+    def _send_message(self, jid, body):
+        self.send_message(jid, body, mtype="chat")
 
-    # def _send_new_question(self):
-    #     new_q = eng.get_new_question()
-    #     new_msg = self.make_message(self.first_contact, new_q, mtype="chat")
-    #     new_msg.send()
-    #     self.timer_on = False
-
-    def message(self, msg):
+    def income_message(self, msg):
         """
         Process incoming message stanzas. Be aware that this also
         includes MUC messages and error messages. It is usually
@@ -90,22 +79,12 @@ class GTalkBot(sleekxmpp.ClientXMPP):
         """
         # TODO(askalyuk): make income message processor independent
         # from XMPP implementation
-        self.logiclib.process_income_message(msg)
-        # if msg['type'] not in ('chat', 'normal'):
-        #     return
-        # (status, rpl) = eng.reply(msg['body'])
-        # if status:
-        #     if not self.timer_on:
-        #         minutes = 10
-        #         msg.reply(rpl + ' I will ask next question in %s minutes' % minutes).send()
-        #         k = lambda: self._send_new_question()
-        #         t = threading.Timer(60 * minutes, k)
-        #         self.timer_on = True
-        #         t.start()
-        #     else:
-        #         msg.reply(rpl + ' Wait for next question.').send()
-        # else:
-        #     if self.timer_on:
-        #         msg.reply('Wait for next question.').send()
-        #     else:
-        #         msg.reply(rpl).send()
+        if msg['type'] not in ('chat', 'normal'):
+            error_message = 'Error income message: %s' % msg
+            self.log.error(error_message)
+            raise ValueError(error_message)
+        # msg['from'] is JID instance
+        bare_jid = msg['from'].bare
+        reply = self.logiclib.process_income_message(bare_jid, msg['body'])
+        if reply:
+            msg.reply(reply).send()

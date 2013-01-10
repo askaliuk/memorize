@@ -5,3 +5,4 @@ memorize.sublime-workspace
 .idea/*
 .DS_store
 *.pyc
+mtbot.db

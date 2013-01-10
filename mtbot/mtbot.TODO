@@ -5,10 +5,9 @@ How to use TODO:
 * ⌘ + d**: toggle task as completed
 
 Last context:
-next step is to implement logiclib.refresh_contact_list method.
-The idea is: if someone adds bot to contact list, it should start teach him/her.
-Method should create or update users according to contact list.
-it should call data access layer method.
+Looks like communication is more complex.
+JID is complex structure like "user@gmail.com/gmail.1E3C1127" and bot can't send message only to full JID, not
+just user@gmail.com. It gets full JID from presense stanza. Need to read deeply about Jabber.
 
 Test infrastructure:
  ✔ create simple test @done (12-12-27 09:52)
@@ -16,11 +15,5 @@ Test infrastructure:
  ✔ finish full session handler test @done (13-01-05 15:07)
 
  Data layer infrastructure:
- ☐ Logiclib should not know about datasource (django orm in our case). It should talk with some specific data layer class which does what it wants.
- ☐ what API do we really need from data access layer?
-     * create_new_user(email, name) - temporary
-     * get_users_to_update() -> returns json users data
-     * update_user_status(user_id, new_status) -> returns success status
-     * update_memory_card_status(memory_card_id, new_status) -> returns success status
-     * get_next_memory_card(user_id) -> returns json data
+ ☐ decide what ORM to use and implement refactor data layer from sqlite
 

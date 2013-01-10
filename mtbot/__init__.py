@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from mtbot import gtalkbot
-from mtbot import logiclib
+from mtbot import gtalkbot, logiclib, settings
 
 
 def start(jid, password):
@@ -11,7 +10,8 @@ def start(jid, password):
     bot = gtalkbot.GTalkBot(jid, password, logic)
 
     # Process users each 60 seconds using build-in SleekXMPP scheduler
-    bot.scheduler.add("mtbot_action", 60, logic.process_users, repeat=True)
+    bot.scheduler.add("mtbot_action", settings.PROCESS_USERS_PERIOD_SECONDS,
+        logic.process_users, repeat=True)
 
     # If you are working with an OpenFire server, you may need
     # to adjust the SSL version used:
