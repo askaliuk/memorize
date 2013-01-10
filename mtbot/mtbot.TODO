@@ -5,15 +5,10 @@ How to use TODO:
 * ⌘ + d**: toggle task as completed
 
 Last context:
-Looks like communication is more complex.
-JID is complex structure like "user@gmail.com/gmail.1E3C1127" and bot can't send message only to full JID, not
-just user@gmail.com. It gets full JID from presense stanza. Need to read deeply about Jabber.
+ ☐ Try Django ORM
 
-Test infrastructure:
- ✔ create simple test @done (12-12-27 09:52)
- ✔ create basic session handler test in test_bot.py (hybrid way) @done (13-01-04 22:32)
- ✔ finish full session handler test @done (13-01-05 15:07)
-
- Data layer infrastructure:
- ☐ decide what ORM to use and implement refactor data layer from sqlite
+ Current TODO:
+ ☐ try Django ORM and may be SQLAlchemy
+ ☐ eventually decide what ORM to use and implement refactor data layer from sqlite
+ ☐ create tests for current logiclib and refactored DAL
 

@@ -36,12 +36,12 @@ class DAL(object):
             cursor.execute('INSERT OR IGNORE INTO user (jid) VALUES (?)',
                 [jid])
 
-    def get_users_for_check(self):
+    def get_users_for_check(self, now):
         self.log.debug('Get users for check')
         with Cursor(self.log) as cursor:
             cursor.execute(
                 "SELECT * FROM user WHERE status <> 0 and " +
-                "next_check <= date('now') and next_check is not null")
+                "next_check <= datetime(?) and next_check is not null", [now])
             return cursor.fetchall()
 
     def update_user(self, user_id, status, next_check):

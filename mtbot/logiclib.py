@@ -53,7 +53,7 @@ class LogicLib(object):
         """
         if not self._send_message:
             raise ValueError('Send message handler is required')
-        users = self.data.get_users_for_check()
+        users = self.data.get_users_for_check(datetime.now())
         self.log.debug('%s users to process' % len(users))
         for user in users:
             try:
