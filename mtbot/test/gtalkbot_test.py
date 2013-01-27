@@ -2,8 +2,7 @@ import logging
 import unittest
 from mtbot.gtalkbot import GTalkBot
 from mock import Mock
-from sleekxmpp.test import SleekTest, TestSocket, TestLiveSocket
-from sleekxmpp.util import Queue
+from sleekxmpp.test import SleekTest, TestSocket
 
 
 class GtalkBotTest(SleekTest):
@@ -17,6 +16,10 @@ class GtalkBotTest(SleekTest):
     def __init__(self, *args, **kwargs):
         SleekTest.__init__(self, *args, **kwargs)
         self.logiclib = Mock()
+
+    def mock_logiclib_method(self, method_name, mock_func):
+        attrs = {'%s.side_effect' % method_name: mock_func}
+        self.logiclib.configure_mock(**attrs)
 
     def memorize_stream_start(self, skip=True, header=None, socket='mock',
                   server='localhost', port=5222, log_level=logging.ERROR):

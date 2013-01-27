@@ -1,8 +1,7 @@
-.env/
 memorize.sublime-project
 memorize.sublime-workspace
 .idea
 .idea/*
 .DS_store
 *.pyc
-mtbot.db
+mtdata.db

@@ -1,2 +1,3 @@
 sleekxmpp
 mock
+django==1.4.3

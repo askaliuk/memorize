@@ -6,12 +6,12 @@ class TestSimple(GtalkBotTest):
 
     def test_simple(self):
         """Basic simple test which interacts with a mocked GTalkBot instance."""
+        def echo(jid, msg):
+            return 'Thanks for sending: %s' % msg
+        self.mock_logiclib_method('process_income_message', echo)
+
         self.memorize_stream_start()
 
-        def echo(msg):
-            msg.reply('Thanks for sending: %(body)s' % msg).send()
-
-        self.xmpp.add_event_handler('message', echo)
         self.recv("""
             <message to="tester@localhost" from="user@localhost">
                 <body>Hi!</body>

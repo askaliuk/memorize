@@ -5,10 +5,10 @@ How to use TODO:
 * ⌘ + d**: toggle task as completed
 
 Last context:
- ☐ Try Django ORM
+ ✔ Use project structure from django-orm-standalone @done (13-01-26 20:30)
+ ☐ replace dal.py with mtdata
 
  Current TODO:
- ☐ try Django ORM and may be SQLAlchemy
- ☐ eventually decide what ORM to use and implement refactor data layer from sqlite
+ ✔ eventually decide what ORM to use and implement refactor data layer from sqlite @done (13-01-26 20:30)
  ☐ create tests for current logiclib and refactored DAL
 
