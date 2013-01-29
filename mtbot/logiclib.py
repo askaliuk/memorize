@@ -2,13 +2,8 @@
 import logging
 import random
 from datetime import datetime, timedelta
-from mtbot import dal, settings
-
-
-class UserStatus:
-    WAIT = 0  # bot should wait for answer from user
-    SEND = 1  # bot should send message according to logic (e.g. next question)
-    ERROR = 2  # error during processing
+from mtbot import settings
+from mtdata import BotUser, UserStatus
 
 
 class LogicLib(object):
@@ -17,7 +12,6 @@ class LogicLib(object):
     def __init__(self):
         super(LogicLib, self).__init__()
         self.log = logging.getLogger(__name__)
-        self.data = dal.DAL()
         self._send_message = None
 
     def refresh_contact_list(self, contact_list):
@@ -27,18 +21,21 @@ class LogicLib(object):
         him/her (add to user's list).
         """
         for jid in contact_list:
-            self.data.create_or_update_user(jid)
+            BotUser.objects.create_or_update(jid)
 
     def process_income_message(self, jid, msg):
-        user = self.data.get_user(jid)
-        if not user:  # ignore unknown user
+        bot_user = None
+        try:
+            bot_user = BotUser.objects.get(jid=jid)
+        except BotUser.DoesNotExist:
             self.log.info(
                 'Income message from unknown user %s: %s' % (jid, msg))
             return None
         self.log.info('Income message from %s: %s' % (jid, msg))
-        self.data.update_user(user[0], UserStatus.SEND,
-            datetime.now() + timedelta(
-                seconds=settings.NEXT_MESSAGE_PERIOD_SECONDS))
+        bot_user.status = UserStatus.SEND
+        bot_user.next_check = datetime.now() + timedelta(
+                seconds=settings.NEXT_MESSAGE_PERIOD_SECONDS)
+        bot_user.save()
         return ('Thanks! Will send you something in %s seconds' %
             settings.NEXT_MESSAGE_PERIOD_SECONDS)
 
@@ -53,7 +50,7 @@ class LogicLib(object):
         """
         if not self._send_message:
             raise ValueError('Send message handler is required')
-        users = self.data.get_users_for_check(datetime.now())
+        users = BotUser.objects.get_unprocessed(datetime.now())
         self.log.debug('%s users to process' % len(users))
         for user in users:
             try:
@@ -61,15 +58,18 @@ class LogicLib(object):
             except Exception as e:
                 self.log.error('Error in processing user jid = %s: %s'
                     % (user[1], e))
-                self.data.update_user(user[0], UserStatus.ERROR, None)
+                user.status = UserStatus.ERROR
+                user.next_check = None
+                user.save()
                 raise
 
     def _process_user(self, user):
-        jid = user[1]
-        self.log.debug('Process user %s' % jid)
-        if user[2] == UserStatus.SEND:
-            self._send_message(jid, self._get_next_message(jid))
-            self.data.update_user(user[0], UserStatus.WAIT, None)
+        self.log.debug('Process user %s' % user.jid)
+        if user.status == UserStatus.SEND:
+            self._send_message(user.jid, self._get_next_message(user.jid))
+            user.status = UserStatus.WAIT
+            user.next_check = None
+            user.save()
 
     def _get_next_message(self, jid):
         return random.choice(['hi', 'hello', 'test'])

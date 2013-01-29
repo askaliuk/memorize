@@ -6,7 +6,8 @@ How to use TODO:
 
 Last context:
  ✔ Use project structure from django-orm-standalone @done (13-01-26 20:30)
- ☐ replace dal.py with mtdata
+ ✔ replace dal.py with mtdata @done (13-01-28 08:55)
+ decide what to do next
 
  Current TODO:
  ✔ eventually decide what ORM to use and implement refactor data layer from sqlite @done (13-01-26 20:30)
