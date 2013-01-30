@@ -10,6 +10,41 @@ class UserStatus:
     ERROR = 2  # error during processing
 
 
+class Deck(models.Model):
+    bot_user = models.ForeignKey('BotUser')
+    name = models.CharField(unique=True, max_length=50)
+
+    class Meta:
+        db_table = 'mtdata_deck'
+
+    def __unicode__(self):
+        return u'%s' % (self.name)
+
+    def __str__(self):
+        return '%s' % (self.name)
+
+
+class Card(models.Model):
+    deck = models.ForeignKey('Deck')
+    question = models.CharField(max_length=100, blank=False)
+    answer = models.CharField(max_length=100, blank=False)
+
+    class Meta:
+        db_table = 'mtdata_card'
+
+    def get_short_question(self, cut=10):
+        short = self.question[:cut].strip()
+        if len(self.question) > cut:
+            short += " ..."
+        return short
+
+    def __unicode__(self):
+        return u'%s' % self.get_short_question()
+
+    def __str__(self):
+        return '%s' % self.get_short_question()
+
+
 class BotUserManager(models.Manager):
     def create_or_update(self, jid):
         log.debug('Create or update BotUser jid = %s' % jid)
@@ -32,6 +67,8 @@ class BotUser(models.Model):
     status = models.IntegerField(choices=STATUS_CHOICES,
         default=UserStatus.WAIT)
     next_check = models.DateTimeField(null=True)
+    # the last card, which was "asked"
+    active_card = models.ForeignKey('Card', null=True)
 
     objects = BotUserManager()
 
@@ -43,4 +80,3 @@ class BotUser(models.Model):
 
     def __str__(self):
         return '%s' % (self.jid)
-

@@ -5,11 +5,9 @@ How to use TODO:
 * ⌘ + d**: toggle task as completed
 
 Last context:
- ✔ Use project structure from django-orm-standalone @done (13-01-26 20:30)
- ✔ replace dal.py with mtdata @done (13-01-28 08:55)
- decide what to do next
+ ☐ implement basic decks/cards management from site (django admin?)
 
  Current TODO:
- ✔ eventually decide what ORM to use and implement refactor data layer from sqlite @done (13-01-26 20:30)
+ ☐ find good flash cards algorythm
+ ☐ move NEXT_MESSAGE_PERIOD_SECONDS to BotUser model
  ☐ create tests for current logiclib and refactored DAL
-

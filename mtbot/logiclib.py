@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 import logging
-import random
 from datetime import datetime, timedelta
 from mtbot import settings
-from mtdata import BotUser, UserStatus
+from mtdata import BotUser, UserStatus, Deck, Card
 
 
 class LogicLib(object):
@@ -32,12 +31,24 @@ class LogicLib(object):
                 'Income message from unknown user %s: %s' % (jid, msg))
             return None
         self.log.info('Income message from %s: %s' % (jid, msg))
+        reply = None
+        if bot_user.active_card:
+            if self._is_correct_answer(msg, bot_user.active_card):
+                reply = ("Correct! I will ask next question in %s seconds" %
+                    settings.NEXT_MESSAGE_PERIOD_SECONDS)
+            else:
+                return "I'm afraid, you are wrong. Try again."
+        else:
+            reply = "Hello. Your next question has been scheduled."
+        # schedule next question action
         bot_user.status = UserStatus.SEND
         bot_user.next_check = datetime.now() + timedelta(
                 seconds=settings.NEXT_MESSAGE_PERIOD_SECONDS)
         bot_user.save()
-        return ('Thanks! Will send you something in %s seconds' %
-            settings.NEXT_MESSAGE_PERIOD_SECONDS)
+        return reply
+
+    def _is_correct_answer(self, msg, card):
+        return msg == card.answer
 
     def set_send_message_handler(self, handler):
         self._send_message = handler
@@ -63,13 +74,38 @@ class LogicLib(object):
                 user.save()
                 raise
 
-    def _process_user(self, user):
-        self.log.debug('Process user %s' % user.jid)
-        if user.status == UserStatus.SEND:
-            self._send_message(user.jid, self._get_next_message(user.jid))
-            user.status = UserStatus.WAIT
-            user.next_check = None
-            user.save()
+    def _process_user(self, bot_user):
+        self.log.debug('Process bot user %s' % bot_user.jid)
+        if bot_user.status == UserStatus.SEND:
+            self._send_message(bot_user.jid, self._get_next_message(bot_user))
+            bot_user.status = UserStatus.WAIT
+            bot_user.next_check = None
+            bot_user.save()
 
-    def _get_next_message(self, jid):
-        return random.choice(['hi', 'hello', 'test'])
+    def _get_next_message(self, bot_user):
+        answers = []
+        active_deck = None
+        active_card = None
+        if Deck.objects.count() == 0:
+            active_deck = Deck(bot_user=bot_user, name="First deck")
+            active_deck.save()
+            answers.append(
+                "You don't have any decks. I've created first one for you.")
+        else:
+            # select random deck
+            active_deck = Deck.objects.order_by('?')[0]
+        if Card.objects.filter(deck=active_deck).count() == 0:
+            active_card = Card(deck=active_deck, question="Say hello",
+                answer="hello")
+            active_card.save()
+            answers.append(
+                "Deck '%s' is empty. I've filled it with test data." %
+                active_deck.name)
+        else:
+            # select random card
+            active_card = Card.objects.filter(deck=active_deck).order_by('?')[0]
+        bot_user.active_card = active_card
+        bot_user.save()
+        if answers:
+            return " ".join(answers + active_card.question)
+        return active_card.question
