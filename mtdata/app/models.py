@@ -10,9 +10,19 @@ class UserStatus:
     ERROR = 2  # error during processing
 
 
+class DeckCategory:
+    # card supports comma-separated set of words and appropriate translations
+    WORD_SET_TRANSLATION = 1
+
+
 class Deck(models.Model):
+    DECK_CATEGORY_CHOICES = (
+        (DeckCategory.WORD_SET_TRANSLATION, 'Word translation'),
+    )
     bot_user = models.ForeignKey('BotUser')
     name = models.CharField(unique=True, max_length=50)
+    category = models.IntegerField(choices=DECK_CATEGORY_CHOICES,
+        default=DeckCategory.WORD_SET_TRANSLATION)
 
     class Meta:
         db_table = 'mtdata_deck'
@@ -49,7 +59,9 @@ class BotUserManager(models.Manager):
     def create_or_update(self, jid):
         log.debug('Create or update BotUser jid = %s' % jid)
         bot_user, created = self.get_or_create(jid=jid)
-        # TODO(askalyuk): update what?
+        if not created:
+            bot_user.active_card = None
+            bot_user.save()
         return bot_user
 
     def get_unprocessed(self, now):

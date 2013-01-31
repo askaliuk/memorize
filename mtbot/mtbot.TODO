@@ -5,9 +5,13 @@ How to use TODO:
 * ⌘ + d**: toggle task as completed
 
 Last context:
- ☐ implement basic decks/cards management from site (django admin?)
+ ✔ decide how to handle list of answers for same question @done (13-01-31 08:21)
+ ✔ implement comma-separated cards handler @done (13-01-31 08:56)
+ ☐ implement basic decks/cards management from site (django admin?) and bot commands
+ ☐ refactor logiclib: separate answer/question handlers, user commands handler
 
  Current TODO:
- ☐ find good flash cards algorythm
+ ☐ fixture data for decks and cards
+ ☐ find good flash cards scheduler algorythm
  ☐ move NEXT_MESSAGE_PERIOD_SECONDS to BotUser model
  ☐ create tests for current logiclib and refactored DAL

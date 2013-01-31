@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 import logging
+import random
 from datetime import datetime, timedelta
 from mtbot import settings
-from mtdata import BotUser, UserStatus, Deck, Card
+from mtdata import BotUser, UserStatus, Deck, Card, DeckCategory
 
 
 class LogicLib(object):
@@ -48,7 +49,14 @@ class LogicLib(object):
         return reply
 
     def _is_correct_answer(self, msg, card):
-        return msg == card.answer
+        if card.deck.category == DeckCategory.WORD_SET_TRANSLATION:
+            words = card.answer.split(',')
+            for word in words:
+                if word.lower() == msg.lower():
+                    return True
+            return False
+        else:
+            raise NotImplemented
 
     def set_send_message_handler(self, handler):
         self._send_message = handler
@@ -68,9 +76,10 @@ class LogicLib(object):
                 self._process_user(user)
             except Exception as e:
                 self.log.error('Error in processing user jid = %s: %s'
-                    % (user[1], e))
+                    % (user.jid, e))
                 user.status = UserStatus.ERROR
                 user.next_check = None
+                user.active_card = None
                 user.save()
                 raise
 
@@ -95,7 +104,7 @@ class LogicLib(object):
             # select random deck
             active_deck = Deck.objects.order_by('?')[0]
         if Card.objects.filter(deck=active_deck).count() == 0:
-            active_card = Card(deck=active_deck, question="Say hello",
+            active_card = Card(deck=active_deck, question="hello",
                 answer="hello")
             active_card.save()
             answers.append(
@@ -106,6 +115,14 @@ class LogicLib(object):
             active_card = Card.objects.filter(deck=active_deck).order_by('?')[0]
         bot_user.active_card = active_card
         bot_user.save()
+        question = self._build_question(active_card)
         if answers:
-            return " ".join(answers + active_card.question)
-        return active_card.question
+            return " ".join(answers + question)
+        return question
+
+    def _build_question(self, card):
+        if card.deck.category == DeckCategory.WORD_SET_TRANSLATION:
+            words = card.question.split(',')
+            return "Translate word '%s'" % random.choice(words)
+        else:
+            raise NotImplemented
